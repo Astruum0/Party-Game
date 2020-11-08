@@ -1,68 +1,65 @@
 import math
 import random
+from copy import deepcopy
 
 
 def bestMove(board, player, difficulty):
     difficulties = {"easy": 1, "medium": 2, "hard": 3, "impossible": 5}
     return (
-        _minmaxAlgorithm(
-            board, difficulties[difficulty], -math.inf, math.inf, True, player
-        )[0]
+        _minmaxAlgorithm(board, difficulties[difficulty], -math.inf, math.inf, True)[0]
         + 1
     )
 
 
-def _minmaxAlgorithm(board, depth, alpha, beta, playerTurn, player):
-    opponent = 1 if player == 2 else 2
+def _minmaxAlgorithm(board, depth, alpha, beta, playerTurn):
+    # opponent = 1 if player == 2 else 2
     validSpots = _findSpots(board)
-
     if depth == 0:
-        return None, _boardScore(board, 2)
-    if _isWinner(board, player):
-        return None, 100000000000000
-    if _isWinner(board, opponent):
-        return None, -100000000000000
+        return (None, _boardScore(board, 2))
+    if _isWinner(board, 2):
+        return (None, 100000000000000)
+    if _isWinner(board, 1):
+        return (None, -100000000000000)
     if len(validSpots) == 0:
-        return None, 0
+        return (None, 0)
 
     if playerTurn:
         value = -math.inf
         bestMove, _ = random.choice(validSpots)
         for col, row in validSpots:
-            copyBoard = _copyOfBoard(board)
-            copyBoard[col][row] = player
-            _, new_score = _minmaxAlgorithm(
-                copyBoard, depth - 1, alpha, beta, False, player
-            )
+            copyBoard = deepcopy(board)
+            copyBoard[col][row] = 2
+            _, new_score = _minmaxAlgorithm(copyBoard, depth - 1, alpha, beta, False)
             if new_score > value:
                 value = new_score
                 bestMove = col
             alpha = max(alpha, value)
             if alpha >= beta:
                 break
-        return bestMove, value
+        return (bestMove, value)
     else:
         value = math.inf
         bestMove, _ = random.choice(validSpots)
         for col, row in validSpots:
-            copyBoard = _copyOfBoard(board)
-            copyBoard[col][row] = opponent
-            _, new_score = _minmaxAlgorithm(
-                copyBoard, depth - 1, alpha, beta, True, player
-            )
+            copyBoard = deepcopy(board)
+            copyBoard[col][row] = 1
+            _, new_score = _minmaxAlgorithm(copyBoard, depth - 1, alpha, beta, True)
             if new_score < value:
                 value = new_score
                 bestMove = col
             beta = min(beta, value)
             if alpha >= beta:
                 break
-        return bestMove, value
+        return (bestMove, value)
 
 
 def _isWinner(board, player):
+    board_w = len(board)
+    board_h = len(board[0])
+
     # Horizontal check
-    for j in range(len(board)):
-        for i in range(len(board[j]) - 3):
+    for j in range(board_h):
+        for i in range(board_w - 3):
             if (
                 board[i][j] == player
                 and board[i + 1][j] == player
@@ -72,8 +69,8 @@ def _isWinner(board, player):
                 return player
 
     # Vertical check
-    for j in range(len(board) - 3):
-        for i in range(len(board[j])):
+    for j in range(board_h - 3):
+        for i in range(board_w):
             if (
                 board[i][j] == player
                 and board[i][j + 1] == player
@@ -83,8 +80,8 @@ def _isWinner(board, player):
                 return player
 
     # Up Left – Bottom Right Diagonal check
-    for j in range(len(board) - 3):
-        for i in range(len(board[j]) - 3):
+    for j in range(board_h - 3):
+        for i in range(board_w - 3):
             if (
                 board[i][j] == player
                 and board[i + 1][j + 1] == player
@@ -94,8 +91,8 @@ def _isWinner(board, player):
                 return player
 
     # Bottom left – Up Right Diagonal check
-    for j in range(3, len(board)):
-        for i in range(len(board[j]) - 3):
+    for j in range(3, board_h):
+        for i in range(board_w - 3):
             if (
                 board[i][j] == player
                 and board[i + 1][j - 1] == player
@@ -120,35 +117,38 @@ def _findSpots(board):
 
 
 def _boardScore(board, player):
+    board_w = len(board)
+    board_h = len(board[0])
+
     score = 0
 
     # Center column
-    centerColumn = [board[len(board) // 2][i] for i in range(len(board))]
+    centerColumn = [board[len(board) // 2][i] for i in range(board_h)]
     score += centerColumn.count(player) * 3
 
     # Vertical
-    for col in range(len(board)):
-        fullColumn = [board[col][i] for i in range(len(board))]
-        for row in range(len(board[col]) - 3):
+    for col in range(board_w):
+        fullColumn = [board[col][i] for i in range(board_h)]
+        for row in range(board_h - 3):
             group4pieces = fullColumn[row : row + 4]
             score += _scoreFrom4Pieces(group4pieces, player)
 
     # Horizontal
-    for row in range(len(board)):
-        fullRow = [board[i][row] for i in range(len(board))]
-        for col in range(len(board[row]) - 3):
-            group4pieces = fullRow[row : row + 4]
+    for row in range(board_h):
+        fullRow = [board[i][row] for i in range(board_w)]
+        for col in range(board_w - 3):
+            group4pieces = fullRow[col : col + 4]
             score += _scoreFrom4Pieces(group4pieces, player)
 
     # Up Left – Bottom Right Diagonal check
-    for col in range(len(board) - 3):
-        for row in range(len(board[col]) - 3):
+    for col in range(board_w - 3):
+        for row in range(board_h - 3):
             group4pieces = [board[col + i][row + i] for i in range(4)]
             score += _scoreFrom4Pieces(group4pieces, player)
 
     # Bottom left – Up Right Diagonal check
-    for col in range(len(board) - 3):
-        for row in range(len(board[col]) - 3):
+    for col in range(board_w - 3):
+        for row in range(board_h - 3):
             group4pieces = [board[col + 3 - i][row + i] for i in range(4)]
             score += _scoreFrom4Pieces(group4pieces, player)
 
@@ -173,8 +173,9 @@ def _scoreFrom4Pieces(group, player):
 
 
 def _copyOfBoard(board):
-    copyB = [[None for _ in range(7)] for _ in range(7)]
+    copyB = [[None for _ in range(len(board[0]))] for _ in range(len(board))]
     for c in range(len(board)):
         for r in range(len(board[c])):
             copyB[c][r] = board[c][r]
     return copyB
+
