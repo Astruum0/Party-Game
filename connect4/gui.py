@@ -28,6 +28,20 @@ class connect4GUI:
 
         self.clock = pygame.time.Clock()
 
+        # bestCol = bestMove(self.engine.board, 2, "impossible")
+        # row = self.engine.getRow(bestCol)
+
+        # self.dropdown = DropTokenAnimation(
+        #     self.engine.round,
+        #     (
+        #         (bestCol - 1) * self.token_size,
+        #         self.token_size + row * self.token_size,
+        #     ),
+        # )
+        # self.animationLoop()
+
+        # self.engine.play(bestCol)
+
     def play(self, difficulty="medium"):
 
         run = True
@@ -41,7 +55,10 @@ class connect4GUI:
                 if e.type == pygame.MOUSEBUTTONDOWN:
                     col = (e.pos[0] // 100) + 1
 
+                    # col = bestMove(self.engine.board, 2, "impossible")
+
                     row = self.engine.getRow(col)
+
                     if type(row) == int:
                         self.dropdown = DropTokenAnimation(
                             self.engine.round,

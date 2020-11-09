@@ -17,9 +17,9 @@ def _minmaxAlgorithm(board, depth, alpha, beta, playerTurn):
     if depth == 0:
         return (None, _boardScore(board, 2))
     if _isWinner(board, 2):
-        return (None, 100000000000000)
+        return (None, 100000000000000 * depth)
     if _isWinner(board, 1):
-        return (None, -100000000000000)
+        return (None, -100000000000000 * depth)
     if len(validSpots) == 0:
         return (None, 0)
 
