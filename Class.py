@@ -12,14 +12,19 @@ class Board:
             return self.board
 
 class Player:
-    def __init__(self):
+    def __init__(self, difficulty):
         self.boat = [(1,5), (2,4), (3,3), (4,3), (5,2)]
         self.destroyed = [[i, 0] for i in range(1,6)]
         self.defense_board = Board()
         self.attack_board = Board()
         self.random_placement(self.boat)
         self.destroyed_boats = 0
-        self.depth = 5000
+
+        if difficulty:
+            print(difficulty)
+            diff = {"easy" : 0.1,"medium" : 1,"hard" : 5,"impossible" : 10}
+            self.difficulty = difficulty
+            self.depth = int(diff[difficulty] * 1000)
 
     def random_placement(self, boats):
         for boat_value, boat_length in boats:
@@ -32,6 +37,12 @@ class Player:
                     for i in range(x, x + boat_length):
                         if self.defense_board.board[i][y] != 0:
                             valid = False
+                        for adj_x, adj_y in [(i-1, y), (i+1, y), (i, y-1), (i, y+1)]:
+                            try:
+                                if self.defense_board.board[adj_x][adj_y] != 0:
+                                    valid = False
+                            except:
+                                pass
                     if valid == True:
                         for i in range(x, x + boat_length):
                             self.defense_board.board[i][y] = boat_value
@@ -42,6 +53,12 @@ class Player:
                     for i in range(y, y + boat_length):
                         if self.defense_board.board[x][i] != 0:
                             valid = False
+                        for adj_x, adj_y in [(x-1, i), (x+1, i), (x, i-1), (x, i+1)]:
+                            try:
+                                if self.defense_board.board[adj_x][adj_y] != 0:
+                                    valid = False
+                            except:
+                                pass
                     if valid == True:
                         for i in range(y, y + boat_length):
                             self.defense_board.board[x][i] = boat_value
@@ -53,6 +70,7 @@ class Player:
             if id_boat == 0:
                 self.attack_board.board[x][y] = 6
                 Player.defense_board.board[x][y] = 6
+                return (False, False, False)
             else:
                 print(f"✓✓✓ Touché en {x+1},{y+1} ✓✓✓")
                 Player.defense_board.board[x][y] = 7
@@ -62,10 +80,10 @@ class Player:
                     self.Destroy(id_boat)
                     self.destroyed_boats += 1
                     if self.destroyed_boats == 5:
-                        return (True, True)
-            return (False, True)
+                        return (False, True, True)
+                return (False, True, False)
         else:
-            return (False, False)
+            return (True, False, False)
 
     def validHit(self, x, y):
         if 0 <= x <= 9 and 0 <= y <= 9:
@@ -91,10 +109,12 @@ class Player:
         for boat in self.destroyed:
             if not self.CheckDestroyed(boat[0] - 1):
                 list_boat.append(self.boat[boat[0] - 1])
-        for i in range(self.depth):
+        for _ in range(self.depth):
             for boat in list_boat:
                 self.hunt(boat[1])
-        self.destroy()
+        print(self.difficulty)
+        if self.difficulty != "easy":
+            self.destroy()
         print(self.attack_board.board)
         print(self.heatmap())
         coo = list(self.dico.keys())[list(self.dico.values()).index(max(self.dico.values()))]
@@ -119,7 +139,7 @@ class Player:
                         valid = False
                 if valid == True:
                     for i in range(x, x + boat):
-                        if (i % 2 == 0 and y % 2 == 1) or (i % 2 == 1 and y % 2 == 0):
+                        if (i % 2 == 0 and y % 2 == 1) or (i % 2 == 1 and y % 2 == 0) or self.difficulty in ["easy", "medium"]:
                             if (i, y) in self.dico:
                                 self.dico[(i,y)] += 1
                             else:
@@ -134,7 +154,7 @@ class Player:
                         valid = False
                 if valid == True:
                     for i in range(y, y + boat):
-                        if (i % 2 == 0 and x % 2 == 1) or (i % 2 == 1 and x % 2 == 0):
+                        if (i % 2 == 0 and x % 2 == 1) or (i % 2 == 1 and x % 2 == 0) or self.difficulty in ["easy", "medium"]:
                             if (x, i) in self.dico:
                                 self.dico[(x,i)] += 1
                             else:
@@ -148,7 +168,7 @@ class Player:
         for i in range(10):
             for j in range(10):
                 neighbours = []
-                if int(board[i][j]) != 0 and int(board[i][j]) != 6 and int(board[i][j]) != 7:
+                if int(board[i][j]) not in [0, 6, 7]:
                     for adj_x, adj_y in [(i-1, j), (i+1, j), (i, j-1), (i, j+1)]:
                         try:
                             if board[adj_x][adj_y] == board[i][j]:

@@ -1,6 +1,15 @@
 from Class import Board, Player
 from random import randint
 import pygame
+import sys
+
+try:
+    difficulty = sys.argv[1]
+    if difficulty not in(["easy","medium","hard","impossible"]): 
+        raise TypeError
+except:
+    print("Argument non valide, difficulté mise a normal")
+    difficulty = "medium"
 
 BLACK = (0, 0, 0)
 WHITE = (255, 255, 255)
@@ -16,8 +25,8 @@ win = pygame.display.set_mode((1600, 765))
 pygame.display.set_caption("Bataille navale")
 clock = pygame.time.Clock()
 
-player = Player()
-bot = Player()
+player = Player(None)
+bot = Player(difficulty)
 finished = False
 running = True
 bot_turn = False
@@ -28,10 +37,11 @@ while running:
     if bot_turn:
         coo = bot.seach_best_move()
         output = bot.SendHit(coo[0], coo[1], player)
-        if output[0]:
+        if output[2]:
             running = False
-            winner = "Bot"
-        bot_turn = False
+            winner = "bot"
+        if not(output[0]) and not(output[1]):
+            bot_turn = False
         
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -42,11 +52,10 @@ while running:
             row = pos[1] // (HEIGHT + MARGIN)
             if not(bot_turn):
                 output = player.SendHit(row, column, bot)
-                print(output)
-                if output[0]:
+                if output[2]:
                     running = False
                     winner = "Player"
-                if output[1]:
+                if not(output[0]) and not(output[1]):
                     bot_turn = True
     win.fill(WHITE)
     for index, board in enumerate([player.attack_board.board, player.defense_board.board]):
