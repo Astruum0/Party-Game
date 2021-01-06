@@ -1,5 +1,5 @@
 from colorama import init, Fore, Style
-from solver import bestMove
+from connect4.solver import bestMove
 import sys
 
 

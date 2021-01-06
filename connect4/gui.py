@@ -1,6 +1,6 @@
-from engine import Engine
-from solver import bestMove
-from animation import DropTokenAnimation
+from connect4.engine import Engine
+from connect4.solver import bestMove
+from connect4.animation import DropTokenAnimation
 import pygame
 
 
@@ -27,6 +27,7 @@ class connect4GUI:
         self.dropdown = None
 
         self.clock = pygame.time.Clock()
+        self.play()
 
         # bestCol = bestMove(self.engine.board, 2, "impossible")
         # row = self.engine.getRow(bestCol)
@@ -42,7 +43,7 @@ class connect4GUI:
 
         # self.engine.play(bestCol)
 
-    def play(self, difficulty="medium"):
+    def play(self):
 
         run = True
         while run:
@@ -78,7 +79,7 @@ class connect4GUI:
                             self.endScreen()
                             break
 
-                        bestCol = bestMove(self.engine.board, 2, "impossible")
+                        bestCol = bestMove(self.engine.board, 2, self.difficulty)
                         row = self.engine.getRow(bestCol)
 
                         self.dropdown = DropTokenAnimation(
