@@ -4,7 +4,7 @@ from copy import deepcopy
 
 
 def bestMove(board, player, difficulty):
-    difficulties = {"easy": 1, "medium": 2, "hard": 3, "impossible": 5}
+    difficulties = {"easy": 1, "medium": 3, "hard": 5}
     return (
         _minmaxAlgorithm(board, difficulties[difficulty], -math.inf, math.inf, True)[0]
         + 1

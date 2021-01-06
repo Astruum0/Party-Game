@@ -14,19 +14,19 @@ import sys
 #     difficulty = "medium"
 
 
-def play(difficulty="medium"):
+def playBattleship(difficulty="medium"):
+    print(difficulty)
     # Define colors and dimensions
     BLACK = (0, 0, 0)
     WHITE = (255, 255, 255)
     GREEN = (0, 255, 0)
     RED = (255, 0, 0)
     BLUE = (0, 0, 255)
-    WIDTH = 60
-    HEIGHT = 60
-    MARGIN = 15
+    WIDTH = 30
+    HEIGHT = 30
+    MARGIN = 7
 
-    pygame.init()
-    win = pygame.display.set_mode((1600, 765))
+    win = pygame.display.set_mode((800, 380))
     pygame.display.set_caption("Bataille navale")
     clock = pygame.time.Clock()
 
@@ -49,14 +49,15 @@ def play(difficulty="medium"):
             output = bot.SendHit(coo[0], coo[1], player)
             if output[2]:
                 running = False
-                winner = "bot"
+                winner = "Bot"
             if not(output[0]) and not(output[1]):
                 bot_turn = False
             coup += 1
             
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                done = True
+                running = False
+                winner = "Personne"
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 pos = pygame.mouse.get_pos()
                 column = pos[0] // (WIDTH + MARGIN) - 11
@@ -76,7 +77,7 @@ def play(difficulty="medium"):
                 for column, case in enumerate(i):
                     offset = 0
                     if index == 0:
-                        offset = 835
+                        offset = 400
                     if case == 0:
                         color = BLUE
                     elif case == 6:
@@ -97,4 +98,3 @@ def play(difficulty="medium"):
     print(f"{winner} a gagné")
     # imageio.mimsave('heatmap/heatmap.gif', bot.images, fps = 2)
     print(coup)
-    pygame.quit()

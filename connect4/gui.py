@@ -107,7 +107,8 @@ class connect4GUI:
 
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
-                    break
+                    self.reset()
+                    return
 
             self.show()
 
@@ -173,7 +174,7 @@ class connect4GUI:
             for e in pygame.event.get():
                 if e.type == pygame.QUIT:
                     self.dropdown = None
-                    break
+                    return
 
             self.dropdown.update()
             self.show()
