@@ -1,5 +1,5 @@
 import pygame
-from math import cos, sin, pi, sinh
+from math import cos, sin, pi, sinh, cosh
 from map import dist
 
 class Car:
@@ -27,7 +27,7 @@ class Car:
         
         if self.connectedPt and not self.angleRotation:
             if dist(self.connectedPt, (self.pos[0] + xvel, self.pos[1] + yvel)) > self.stringLength:
-                self.angleRotation = 2 * sinh(self.vel/(2*self.stringLength))
+                self.angleRotation = ((180 - 2 * sinh((self.vel/(2*self.stringLength)))) / 2)
                 print(self.angleRotation)
                 if self.pointSide == "right":
                     self.angleRotation *= -1
