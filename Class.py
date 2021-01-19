@@ -82,7 +82,6 @@ class Player:
                 Player.defense_board.board[x][y] = 6
                 return (False, False, False)
             else:
-                print(f"✓✓✓ Touché en {x+1},{y+1} ✓✓✓")
                 Player.defense_board.board[x][y] = 12
                 self.attack_board.board[x][y] = id_boat
                 self.destroyed[id_boat-1][1] += 1
@@ -108,7 +107,7 @@ class Player:
             return True
         return False
 
-    # Modify the attack board when a bot is destroyed
+    # Modify the attack board when a board is destroyed
     def Destroy(self, boat):
         for i in range(10):
             for j in range(10):
@@ -118,7 +117,7 @@ class Player:
     ### AI PART ###
 
     # Main AI method
-    def seach_best_move(self):
+    def search_best_move(self):
         self.dico = {}
         list_boat = []
         # Add all the remaining boat of the opponent defense board to a list
@@ -231,7 +230,7 @@ class Player:
 
     # Heatmap gif creator
     def heatmap(self):
-        if self.difficulty == "hard":
+        if self.difficulty == "medium":
             heatmap = np.zeros((10, 10))
             for i in range(10):
                 for j in range(10):

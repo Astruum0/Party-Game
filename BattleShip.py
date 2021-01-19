@@ -43,7 +43,7 @@ while running:
     
     # Player and AI turn
     if bot_turn:
-        coo = bot.seach_best_move()
+        coo = bot.search_best_move()
         output = bot.SendHit(coo[0], coo[1], player)
         if output[2]:
             running = False
@@ -92,7 +92,6 @@ while running:
 
 
     pygame.display.flip()
-print(f"{winner} a gagné")
+print(f"{winner} a gagné en {coup} coups")
 imageio.mimsave('heatmap/heatmap.gif', bot.images, fps = 2)
-print(coup)
 pygame.quit()
