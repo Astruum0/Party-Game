@@ -30,6 +30,7 @@ clock = pygame.time.Clock()
 
 # Create instance for the player and the AI
 player = Player(None)
+print(player.defense_board.board)
 bot = Player(difficulty)
 
 finished = False
