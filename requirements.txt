@@ -1,0 +1,5 @@
+matplotlib==3.3.3
+imageio==2.9.0
+numpy==1.19.3
+seaborn==0.11.0
+pygame==2.0.0
