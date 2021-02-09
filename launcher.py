@@ -10,7 +10,7 @@ class gameButton:
         self.game = name
         self.image = pygame.image.load(f"assets/launcher/btn-{name}.png")
         self.x = 75
-        self.y = 200 + 70*index
+        self.y = 200 + 70 * index
         self.width = 450
         self.height = 60
         
