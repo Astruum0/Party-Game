@@ -22,5 +22,5 @@ class Ground(pygame.sprite.Sprite):
     def reset(self):
         self.x = 0
 
-    def draw(self, win):
-        win.blit(self.image, (self.rect.x, self.rect.y))
+    def draw(self, win, offset=0):
+        win.blit(self.image, (self.rect.x + offset, self.rect.y))

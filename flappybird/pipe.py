@@ -23,7 +23,7 @@ class Pipe(pygame.sprite.Sprite):
     def reset(self):
         self.listPipes = [(self.xDefault, random.randint(250, 550))]
 
-    def draw(self, win):
-        win.blit(self.image, (self.rect.x, self.rect.y))
+    def draw(self, win, offset=0):
+        win.blit(self.image, (self.rect.x + offset, self.rect.y))
 
     

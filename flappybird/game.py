@@ -1,12 +1,13 @@
 import pygame
 import neat
 import os
-from bird import Bird
-from ground import Ground
-from pipe import Pipe
-from score import Score
+import pickle
+from flappybird.bird import Bird
+from flappybird.ground import Ground
+from flappybird.pipe import Pipe
+from flappybird.score import Score
 
-class game:
+class Game:
     def __init__(self):
         pygame.init()
         self.w = 576
@@ -89,6 +90,96 @@ class game:
                 self.timeClock += 1
             self.clock.tick(30)
     
+    def playVsBot(self, lvl):
+        self.win = pygame.display.set_mode((self.w, self.h))
+        
+        with open(f"flappybird/lvl_{lvl}_flappybird", "rb") as f:
+            net = pickle.load(f)
+
+        self.bird = Bird(self.w//6, 400 - 25)
+            
+        birdBot = Bird(self.w//6 + 70, 400 - 25, True)
+        self.timeClock = 0
+        self.game = True
+        
+        self.list_pipes.append(Pipe())
+        
+        while self.game: 
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: 
+                    self.game = False
+                    return
+                
+            self.updateScore()
+            keys = pygame.key.get_pressed()
+            if keys[pygame.K_SPACE]:
+                self.bird.jump()
+            
+            pipe_ind = 0
+            if len(self.list_pipes) > 1 and birdBot.rect.x > self.list_pipes[0].rect.x + self.list_pipes[0].rect.w:
+                pipe_ind = 1
+
+            if not birdBot.dead:
+                birdBot.updateImgs()
+                birdBot.affectGravity()
+            
+            self.bird.updateImgs()
+            self.bird.affectGravity()
+            
+            output = net.activate((birdBot.rect.y, abs(birdBot.rect.y - (self.list_pipes[pipe_ind].y + 100)), abs(birdBot.rect.y - (self.list_pipes[pipe_ind].y - 100))))  
+            if output[0] > 0.5:
+                birdBot.jump()
+                            
+
+            self.ground.update()
+            
+            
+            
+                
+            if self.list_pipes[-1].rect.x <= (2*self.w)//5:    
+                self.list_pipes.append(Pipe())
+                # self.all_sprites_list.add(self.list_pipes[-1])
+            if self.list_pipes[0].rect.x <= -self.list_pipes[0].w:
+                # self.all_sprites_list.remove(self.list_pipes[0])
+                self.list_pipes.pop(0)
+            for pipe in self.list_pipes:
+                pipe.update()
+                if birdBot.collide(pipe):
+                    birdBot.dead = True
+                if self.bird.collide(pipe):
+                    self.launch = False
+                    self.game = False
+                    self.gameOverScreen(lvl)
+                    return
+
+
+            # self.all_sprites_list.remove(self.ground)
+            # self.all_sprites_list.add(self.ground)
+
+            
+            if self.game:        
+                self.win.blit(self.bg, (0, 0))
+                for pipe in self.list_pipes:
+                    pipe.draw(self.win)
+                self.ground.draw(self.win)
+                if not birdBot.dead:
+                    birdBot.draw(self.win)
+                
+                self.bird.draw(self.win)
+                
+                self.ground.draw(self.win)
+                        
+                # self.all_sprites_list.update()
+                # self.all_sprites_list.clear(self.win, self.bg)
+                # spriteslist = self.all_sprites_list.draw(self.win)
+                # pygame.display.update(spriteslist)
+                self.score.draw(self.win)
+                
+                
+                pygame.display.update()
+                self.timeClock += 1
+            self.clock.tick(30)
+    
     def runBot(self, genomes, config):
         nets = []
         ge = []
@@ -126,11 +217,15 @@ class game:
                 self.game = False
                 self.reset()
                 break
+            
+            
                     
             for x, bird in enumerate(birds):
                 bird.updateImgs()
                 bird.affectGravity()
-                
+                for pipe in self.list_pipes:
+                    if pipe.rect.x <= bird.rect.x and pipe.rect.x >= bird.rect.x + self.ground.xspeed:
+                        bird.score += 1
                 ge[x].fitness += 0.01
                 output = nets[x].activate((bird.rect.y, abs(bird.rect.y - (self.list_pipes[pipe_ind].y + 100)), abs(bird.rect.y - (self.list_pipes[pipe_ind].y - 100))))
                 
@@ -202,7 +297,7 @@ class game:
                 self.score.addscore()
                 self.win.blit(self.bg, (0, 0))
 
-    def gameOverScreen(self):
+    def gameOverScreen(self, difficulty=None):
         self.gameOverBoucle = True
         self.timeClock = 0
         while self.gameOverBoucle:
@@ -213,13 +308,17 @@ class game:
             keys = pygame.key.get_pressed()
             if keys[pygame.K_SPACE] and self.timeClock >= 20:
                 self.gameOverBoucle = False
-                for pipe in self.list_pipes:
-                    self.all_sprites_list.remove(pipe)    
+                # for pipe in self.list_pipes:
+                    # self.all_sprites_list.remove(pipe)    
                 self.reset()
-                self.runSolo()
+                
+                if difficulty:
+                    self.playVsBot(difficulty)
+                else:
+                    self.runSolo()
                 return
             self.score.updateNewHighscore(self.win)
-            self.all_sprites_list.clear(self.win, self.bg)
+            # self.all_sprites_list.clear(self.win, self.bg)
             self.bird.draw(self.win)
             for pipe in self.list_pipes:
                 pipe.draw(self.win)
@@ -241,12 +340,12 @@ def run():
     
     config = neat.config.Config(neat.DefaultGenome, neat.DefaultReproduction, neat.DefaultSpeciesSet, neat.DefaultStagnation, config_path)
     p = neat.Population(config)
-    p.add_reporter(neat.StdOutReporter(True))
-    p.add_reporter(neat.StatisticsReporter())
+    # p.add_reporter(neat.StdOutReporter(True))
+    # p.add_reporter(neat.StatisticsReporter())
     
     winner = p.run(jeu.runBot, 50)
 
-run()
+# run()
 
-# jeu = game()
-# jeu.runSolo()
+# jeu = Game()
+# jeu.playVsBot(3)
