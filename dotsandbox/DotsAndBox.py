@@ -9,9 +9,8 @@ offset = 40
 ecart = 80
 current_player = 0
 width = 5
-color = ["red", "blue"]
+color = [(255, 0, 0), (0, 0,255)]
 score = [0, 0]
-pygame.init()
 dimension = offset * 2 + (taille - 1) * ecart
 win = pygame.display.set_mode((dimension, dimension))
 pygame.display.set_caption("Dots and Boxes")
@@ -103,7 +102,7 @@ def draw_board():
     for i, line in enumerate(game.board):
         for j, case in enumerate(line):
             coo = (ecart * j + offset, ecart * i + offset)
-            pygame.draw.circle(win, "black", coo, width)
+            pygame.draw.circle(win, (0, 0, 0), coo, width)
             index = (taille * i) + j   
             if (index, index+1) in game.lines.keys():
                 pygame.draw.line(win, color[game.lines[(index, index+1)]], coo, (coo[0] + ecart, coo[1]), width)
@@ -112,9 +111,9 @@ def draw_board():
     for square, player in game.square_won.items():
         x, y = square
         if player == 0:
-            textsurface = myfont.render('R', False, "red")
+            textsurface = myfont.render('R', False, color[0])
         else:
-            textsurface = myfont.render('B', False, "blue")
+            textsurface = myfont.render('B', False, color[1])
         win.blit(textsurface,(y * ecart + offset + (ecart / 3), x * ecart + offset + (ecart / 3) ))
 
 
@@ -122,7 +121,7 @@ running = True
 game = Game()
 
 while running: 
-    win.fill("white")
+    win.fill((255, 255, 255))
     clock.tick(60)
 
     for event in pygame.event.get():
@@ -138,8 +137,8 @@ while running:
     trace_lines(None, None)
     draw_board()
 
-    pygame.display.flip()
+    pygame.display.update()
 
 print(f"Le gagnant est joueur {score.index(max(score)) + 1} ( {max(score)} points )") 
-pygame.quit()
+
 
