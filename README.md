@@ -2,7 +2,7 @@
 
 YDAY Algo 2020-2021.
 
-Party-game est un sorte de groupe de mini-jeux où le joueur s'affronte avec un bot ayant une difficulté que le joueur à défini en lancant le jeu.
+Party-game est un sorte de groupe de mini-jeux où le joueur s'affronte avec un bot ayant une difficulté que le joueur a défini en lancant le jeu.
 
 Ce projet propose 4 mini-jeux:
 
@@ -11,7 +11,7 @@ Ce projet propose 4 mini-jeux:
 - Flappy Bird
 - Dots & Box
 
-Le joueur à le choix entre 3 niveaux de difficultés pour chacun des jeux.
+Le joueur a le choix entre 3 niveaux de difficultés pour chacuns des jeux.
 
 # Installation
 
@@ -56,5 +56,7 @@ Flappy Bird est un jeu à la base jouable en solo : le but est de passer à trav
 Dans le cadre d'un jeu en multijoueur, le but est d'aller plus loin que l'adversaire pour gagner.
 
 # Jeu 4 : Dots & Box
+
+![Dots & Box](https://i.imgur.com/riPA9Je.png)
 
 A tour de rôle, chaque joueur doit relier 2 points entre eux, le joueur remporte un point lorsqu'il complete un carré en tracant la dernière ligne, il peut ainsi rejouer. La partie se termine quand tous les points sont reliés entre eux.

@@ -1,7 +1,7 @@
 from connect4.gui import connect4GUI
 from battleship.BattleShip import playBattleship
 from flappybird.game import Game
-# from dotsandbox.DotsAndBox import play
+from dotsandbox.DotsAndBox import play
 import pygame
 
 class gameButton:
@@ -49,8 +49,8 @@ class gameButton:
             elif self.game == "flappybird":
                 game = Game()
                 game.playVsBot(self.difficultyIndex + 1)
-            # elif self.game == "dots":
-            #     play()
+            elif self.game == "dots":
+                play(difficulty)
                 
         else:
             return

@@ -1,7 +1,8 @@
 import numpy as np
 import pygame
 import math
-from ai import get_best_move
+import time
+from dotsandbox.ai import get_best_move
 
 class Game:
     def __init__(self, taille):
