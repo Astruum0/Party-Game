@@ -1,7 +1,5 @@
 import numpy as np
 from random import randint
-import matplotlib.pylab as plt
-import imageio
 from time import sleep
 
 

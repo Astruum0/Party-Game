@@ -2,7 +2,6 @@ from battleship.Class import Board, Player
 from random import randint
 import pygame
 import sys
-import imageio
 from battleship.start import place_boat
 
 def playBattleship(difficulty="medium"):
@@ -37,6 +36,7 @@ def playBattleship(difficulty="medium"):
     running = True
     bot_turn = randint(0, 1)
     coup = 0
+    winner = ""
 
     # Game Loop
     while run:
@@ -68,7 +68,7 @@ def playBattleship(difficulty="medium"):
                 coup += 1
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
-                    running = False
+                    run = False
                 elif event.type == pygame.MOUSEBUTTONDOWN:
                     pos = pygame.mouse.get_pos()
                     column = pos[0] // (WIDTH + MARGIN) - 11

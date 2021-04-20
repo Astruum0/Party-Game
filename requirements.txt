@@ -1,3 +1,5 @@
 pygame==1.9.6
 colorama
 numpy
+neat-python
+pickle5
