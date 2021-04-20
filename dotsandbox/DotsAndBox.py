@@ -3,12 +3,15 @@ import pygame
 import math
 from ai import get_best_move
 
-
 class Game:
-    def __init__(self):
-        self.board = np.zeros((taille, taille))
+    def __init__(self, taille):
+        self.taille = taille
+        self.board = np.zeros((self.taille, taille))
         self.lines = {}
         self.square_won = {}
+        self.score = [0, 0]
+        self.current_player = 0
+        self.running = True
         self.player1 = 1
         self.player2 = 2
 
@@ -18,34 +21,32 @@ class Game:
             self.check_square()
 
     def check_square(self):
-        global current_player
         next = False
-        for x in range(0, taille - 1):
-            for y in range(0, taille - 1):
-                to_check = [(x * taille + y, x * taille + y + 1),
-                            ((x + 1) * taille + y, (x + 1) * taille + y + 1),
-                            (x * taille + y, (x + 1) * taille + y),
-                            (x * taille + y + 1, (x + 1) * taille + y + 1)]
+        for x in range(0, self.taille - 1):
+            for y in range(0, self.taille - 1):
+                to_check = [(x * self.taille + y, x * self.taille + y + 1),
+                            ((x + 1) * self.taille + y, (x + 1) * self.taille + y + 1),
+                            (x * self.taille + y, (x + 1) * self.taille + y),
+                            (x * self.taille + y + 1, (x + 1) * self.taille + y + 1)]
                 valid = True
                 for check in to_check:
                     if check not in self.lines:
                         valid = False
                 if valid == True:
                     if (x, y) not in self.square_won:
-                        self.square_won[(x,y)] = current_player
-                        score[current_player] += 1
-                        current_player = not(current_player)
+                        self.square_won[(x,y)] = self.current_player
+                        self.score[self.current_player] += 1
+                        self.current_player = not(self.current_player)
                         self.check_win()    
-        current_player = not(current_player)                    
+        self.current_player = not(self.current_player)                    
 
     def check_win(self):
-        global running
-        if len(self.square_won) == (taille - 1) * (taille - 1):
-            running = False
+        if len(self.square_won) == (self.taille - 1) * (self.taille - 1):
+            self.running = False
 
 
-
-def trace_lines(game, player, click = False):
+def trace_lines(game, win, player, click = False):
+    taille, offset, ecart, width, color = 5, 40, 80, 5, [(255, 0, 0), (0, 0,255)]
     temp = []
     pos = pygame.mouse.get_pos()
 
@@ -67,24 +68,27 @@ def trace_lines(game, player, click = False):
                     index = i
             if index == 0:
                 if number > 0:
-                    pygame.draw.line(win, color[current_player], ((x + 1) * ecart + offset, y * ecart + offset), ((x + 1) * ecart + offset, (y + 1) * ecart + offset), width)
+                    pygame.draw.line(win, color[player], ((x + 1) * ecart + offset, y * ecart + offset), ((x + 1) * ecart + offset, (y + 1) * ecart + offset), width)
                     if click == True:
                         game.draw_line((y * taille) + x + 1, (y + 1) * taille + x + 1, player)
                 else:
-                    pygame.draw.line(win, color[current_player], (x * ecart + offset, y * ecart + offset), (x * ecart + offset, (y + 1) * ecart + offset), width)
+                    pygame.draw.line(win, color[player], (x * ecart + offset, y * ecart + offset), (x * ecart + offset, (y + 1) * ecart + offset), width)
                     if click == True:
                         game.draw_line((y * taille) + x, (y + 1) * taille + x, player)
             else:
                 if number > 0:
-                    pygame.draw.line(win, color[current_player], (x * ecart + offset, (y + 1) * ecart + offset), ((x + 1) * ecart + offset, (y + 1) * ecart + offset), width)
+                    pygame.draw.line(win, color[player], (x * ecart + offset, (y + 1) * ecart + offset), ((x + 1) * ecart + offset, (y + 1) * ecart + offset), width)
                     if click == True:
                         game.draw_line((y + 1) * taille + x, (y + 1) * taille + x + 1, player)
                 else:
-                    pygame.draw.line(win, color[current_player], (x * ecart + offset, y * ecart + offset), ((x + 1) * ecart + offset, y * ecart + offset), width)
+                    pygame.draw.line(win, color[player], (x * ecart + offset, y * ecart + offset), ((x + 1) * ecart + offset, y * ecart + offset), width)
                     if click == True:
                         game.draw_line(y * taille + x, y * taille + x + 1, player)
 
-def draw_board():
+def draw_board(game, win):
+    taille, offset, ecart, width, color = 5, 40, 80, 5, [(255, 0, 0), (0, 0,255)]
+    pygame.font.init()
+    myfont = pygame.font.SysFont('Arial Bold', 40)
     for i, line in enumerate(game.board):
         for j, case in enumerate(line):
             coo = (ecart * j + offset, ecart * i + offset)
@@ -103,45 +107,47 @@ def draw_board():
         win.blit(textsurface,(y * ecart + offset + (ecart / 3), x * ecart + offset + (ecart / 3) ))
 
 def play(difficulty):
-
-    taille = 5
-    offset = 40
-    ecart = 80
-    current_player = 0
-    width = 5
-    color = [(255, 0, 0), (0, 0,255)]
-    score = [0, 0]
+    taille, offset, ecart, width, color = 5, 40, 80, 5, [(255, 0, 0), (0, 0,255)]
+    pygame.font.init()
+    font = pygame.font.SysFont('Arial Bold', 40)
     dimension = offset * 2 + (taille - 1) * ecart
     win = pygame.display.set_mode((dimension, dimension))
     pygame.display.set_caption("Dots and Boxes")
     clock = pygame.time.Clock()
-    pygame.font.init()
-    myfont = pygame.font.SysFont('Arial Bold', 40)
+    game = Game(taille)
 
-    running = True
-    game = Game()
-
-    while running: 
+    while game.running: 
         win.fill((255, 255, 255))
         clock.tick(60)
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
-            if event.type == pygame.MOUSEBUTTONDOWN and current_player == 0:
-                trace_lines(game, current_player, True)
+                game.running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and game.current_player == 0:
+                trace_lines(game, win, game.current_player, True)
             
-        if current_player == 1:
+        if game.current_player == 1:
             best_move = get_best_move(game, taille, difficulty)
-            game.draw_line(best_move[0], best_move[1], current_player)
+            game.draw_line(best_move[0], best_move[1], game.current_player)
 
-        trace_lines(None, None)
-        draw_board()
+        trace_lines(game, win, game.current_player, None)
+        draw_board(game, win)
 
         pygame.display.update()
 
-    print(f"Le gagnant est joueur {score.index(max(score)) + 1} ( {max(score)} points )") 
-
+    run = True
+    while run:
+        win.fill((255, 255, 255))
+        winner = game.score.index(max(game.score))
+        if winner == 0:
+            text = font.render("You win!", True, (0,0,0))
+        else:
+            text = font.render("You lose!", True, (0,0,0))
+        text_rect = text.get_rect(center=(dimension/2, dimension/2))
+        win.blit(text, text_rect)
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                run = False
+        pygame.display.update()
 
 if __name__ == "__main__":
     play("hard")
