@@ -13,6 +13,7 @@ class Game:
         self.score = [0, 0]
         self.current_player = 0
         self.running = True
+        self.end = False
         self.player1 = 1
         self.player2 = 2
 
@@ -43,7 +44,7 @@ class Game:
 
     def check_win(self):
         if len(self.square_won) == (self.taille - 1) * (self.taille - 1):
-            self.running = False
+            self.end = True
 
 
 def trace_lines(game, win, player, click = False):
@@ -118,37 +119,36 @@ def play(difficulty):
     game = Game(taille)
 
     while game.running: 
-        win.fill((255, 255, 255))
-        clock.tick(60)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                game.running = False
-            if event.type == pygame.MOUSEBUTTONDOWN and game.current_player == 0:
-                trace_lines(game, win, game.current_player, True)
-            
-        if game.current_player == 1:
-            best_move = get_best_move(game, taille, difficulty)
-            game.draw_line(best_move[0], best_move[1], game.current_player)
-
-        trace_lines(game, win, game.current_player, None)
-        draw_board(game, win)
-
-        pygame.display.update()
-
-    run = True
-    while run:
-        win.fill((255, 255, 255))
-        winner = game.score.index(max(game.score))
-        if winner == 0:
-            text = font.render("You win!", True, (0,0,0))
+        if game.end:
+            win.fill((255, 255, 255))
+            winner = game.score.index(max(game.score))
+            if winner == 0:
+                text = font.render("You win!", True, (0,0,0))
+            else:
+                text = font.render("You lose!", True, (0,0,0))
+            text_rect = text.get_rect(center=(dimension/2, dimension/2))
+            win.blit(text, text_rect)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game.running = False
         else:
-            text = font.render("You lose!", True, (0,0,0))
-        text_rect = text.get_rect(center=(dimension/2, dimension/2))
-        win.blit(text, text_rect)
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                run = False
+            win.fill((255, 255, 255))
+            clock.tick(60)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    game.running = False
+                if event.type == pygame.MOUSEBUTTONDOWN and game.current_player == 0:
+                    trace_lines(game, win, game.current_player, True)
+                
+            if game.current_player == 1:
+                best_move = get_best_move(game, taille, difficulty)
+                game.draw_line(best_move[0], best_move[1], game.current_player)
+
+            trace_lines(game, win, game.current_player, None)
+            draw_board(game, win)
+
         pygame.display.update()
+
 
 if __name__ == "__main__":
     play("hard")
