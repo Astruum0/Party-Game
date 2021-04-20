@@ -3,20 +3,6 @@ import pygame
 import math
 from ai import get_best_move
 
-difficulty = "hard"
-taille = 5
-offset = 40
-ecart = 80
-current_player = 0
-width = 5
-color = [(255, 0, 0), (0, 0,255)]
-score = [0, 0]
-dimension = offset * 2 + (taille - 1) * ecart
-win = pygame.display.set_mode((dimension, dimension))
-pygame.display.set_caption("Dots and Boxes")
-clock = pygame.time.Clock()
-pygame.font.init()
-myfont = pygame.font.SysFont('Arial Bold', 40)
 
 class Game:
     def __init__(self):
@@ -116,29 +102,46 @@ def draw_board():
             textsurface = myfont.render('B', False, color[1])
         win.blit(textsurface,(y * ecart + offset + (ecart / 3), x * ecart + offset + (ecart / 3) ))
 
+def play(difficulty):
 
-running = True
-game = Game()
+    taille = 5
+    offset = 40
+    ecart = 80
+    current_player = 0
+    width = 5
+    color = [(255, 0, 0), (0, 0,255)]
+    score = [0, 0]
+    dimension = offset * 2 + (taille - 1) * ecart
+    win = pygame.display.set_mode((dimension, dimension))
+    pygame.display.set_caption("Dots and Boxes")
+    clock = pygame.time.Clock()
+    pygame.font.init()
+    myfont = pygame.font.SysFont('Arial Bold', 40)
 
-while running: 
-    win.fill((255, 255, 255))
-    clock.tick(60)
+    running = True
+    game = Game()
 
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
-        if event.type == pygame.MOUSEBUTTONDOWN and current_player == 0:
-            trace_lines(game, current_player, True)
-        
-    if current_player == 1:
-        best_move = get_best_move(game, taille, difficulty)
-        game.draw_line(best_move[0], best_move[1], current_player)
+    while running: 
+        win.fill((255, 255, 255))
+        clock.tick(60)
 
-    trace_lines(None, None)
-    draw_board()
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN and current_player == 0:
+                trace_lines(game, current_player, True)
+            
+        if current_player == 1:
+            best_move = get_best_move(game, taille, difficulty)
+            game.draw_line(best_move[0], best_move[1], current_player)
 
-    pygame.display.update()
+        trace_lines(None, None)
+        draw_board()
 
-print(f"Le gagnant est joueur {score.index(max(score)) + 1} ( {max(score)} points )") 
+        pygame.display.update()
+
+    print(f"Le gagnant est joueur {score.index(max(score)) + 1} ( {max(score)} points )") 
 
 
+if __name__ == "__main__":
+    play("hard")

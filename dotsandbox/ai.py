@@ -4,7 +4,7 @@ banned = []
 def get_best_move(game_state, width, difficulty):
     if difficulty == "easy":
         return random_move(game_state.lines, width, difficulty)
-    if difficulty == "normal":
+    if difficulty == "medium":
         return find_complete(game_state.lines, width, difficulty)
     if difficulty == "hard":
         return find_complete(game_state.lines, width, difficulty)
